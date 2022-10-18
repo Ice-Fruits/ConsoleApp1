@@ -87,11 +87,23 @@ namespace MyApp // Note: actual namespace depends on the project name.
                         switch ((Command)int.Parse(array[0]))
                         {
                             case Command.Login:
-                                Console.WriteLine("开始登陆");
-                                string qudaoid = array[1];
-                                str += Class1.Login(qudaoid);
-                                //返回给客户端
-                                myClientSocket.Send(Encoding.UTF8.GetBytes(str));
+                                {
+                                    Console.WriteLine("开始登陆");
+                                    string qudaoid = array[1];
+                                    str += Class1.Login(qudaoid);
+                                    //返回给客户端
+                                    myClientSocket.Send(Encoding.UTF8.GetBytes(str));
+                                }
+                                break;
+                            case Command.Register:
+                                {
+                                    Console.WriteLine("开始注册");
+                                    string qudaoid = array[1];
+                                    string name = array[2];
+                                    str += Class1.Register(qudaoid, name);
+                                    //返回给客户端
+                                    myClientSocket.Send(Encoding.UTF8.GetBytes(str));
+                                }
                                 break;
                         }
                     }

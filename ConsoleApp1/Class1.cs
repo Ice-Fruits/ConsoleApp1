@@ -9,9 +9,9 @@ namespace ConsoleApp1
 {
     internal class Class1
     {
+        static string connectStr = "server=127.0.0.1;port=3306;database=game1;user=root;password=hqq88888;";//sql连接数据参数
         static void Read()
         {
-            string connectStr = "server=127.0.0.1;port=3306;database=game1;user=root;password=hqq88888;";//sql连接数据参数
             MySqlConnection conn = new MySqlConnection(connectStr);//还未与数据库建立连接
             try//捕捉异常，并打印
             {
@@ -51,7 +51,6 @@ namespace ConsoleApp1
         }
         static void Insert()//封装测试-数据库插入操作
         {
-            string connectStr = "server=127.0.0.1;port=3306;database=game1;user=root;password=hqq88888;";//sql连接数据参数
             MySqlConnection conn = new MySqlConnection(connectStr);//还未与数据库建立连接
             try//捕捉异常，并打印
             {
@@ -76,7 +75,6 @@ namespace ConsoleApp1
         }
         static void Update()//封装测试-数据库更新数据
         {
-            string connectStr = "server=127.0.0.1;port=3306;database=game1;user=root;password=hqq88888;";//sql连接数据参数
             MySqlConnection conn = new MySqlConnection(connectStr);//还未与数据库建立连接
             try//捕捉异常，并打印
             {
@@ -102,7 +100,6 @@ namespace ConsoleApp1
         }
         static void Delete()//封装测试-删除数据
         {
-            string connectStr = "server=127.0.0.1;port=3306;database=game1;user=root;password=hqq88888;";//sql连接数据参数
             MySqlConnection conn = new MySqlConnection(connectStr);//还未与数据库建立连接
             try//捕捉异常，并打印
             {
@@ -128,7 +125,6 @@ namespace ConsoleApp1
         }
         static void ReadUsersCount()//封装测试-查询一些值
         {
-            string connectStr = "server=127.0.0.1;port=3306;database=game1;user=root;password=hqq88888;";//sql连接数据参数
             MySqlConnection conn = new MySqlConnection(connectStr);//还未与数据库建立连接
             try//捕捉异常，并打印
             {
@@ -155,7 +151,6 @@ namespace ConsoleApp1
         }
         static void ExecuteScalar()//封装测试-执行一些查询，返回一个单个的值
         {
-            string connectStr = "server=127.0.0.1;port=3306;database=game1;user=root;password=hqq88888;";//sql连接数据参数
             MySqlConnection conn = new MySqlConnection(connectStr);//还未与数据库建立连接
             try//捕捉异常，并打印
             {
@@ -184,32 +179,113 @@ namespace ConsoleApp1
 
         public static string Login(string qudaoid)
         {
-            string connectStr = "server=127.0.0.1;port=3306;database=game1;user=root;password=hqq88888;";//sql连接数据参数
-            MySqlConnection conn = new MySqlConnection(connectStr);//还未与数据库建立连接
+            MySqlConnection conn = new MySqlConnection(Class1.connectStr);//还未与数据库建立连接
             try//捕捉异常，并打印
             {
                 conn.Open();//建立连接
                 Console.WriteLine("已经与数据库建立连接");
 
-                string sql = String.Format("SELECT * FROM game1.users WHERE qudaoid={0}",qudaoid);//数据库操作命令,读取数据行数
+                string sql = String.Format("SELECT * FROM game1.users WHERE qudaoid='{0}'",qudaoid);//数据库操作命令,读取数据行数
 
                 MySqlCommand cmd = new MySqlCommand(sql, conn);//数据库命令类
                 MySqlDataReader reader = cmd.ExecuteReader();
                 reader.Read();
-                int userid = Convert.ToInt32(reader[2].ToString());
-                Console.WriteLine(userid);
-                reader.Close();
-                //找到后再去查找用户信息表
-                sql = String.Format("SELECT * FROM game1.usersinfo WHERE userid={0}", userid);
-                cmd.CommandText = sql;
-                reader = cmd.ExecuteReader();
+                if (reader.HasRows)//存在
+                {
+                    string userid = reader[2].ToString();
+                    Console.WriteLine(userid);
+                    reader.Close();
+                    //找到后再去查找用户信息表
+                    sql = String.Format("SELECT * FROM game1.usersinfo WHERE userid='{0}'", userid);
+                    cmd.CommandText = sql;
+                    reader = cmd.ExecuteReader();
+                    reader.Read();
+                    string result = reader[0].ToString();
+                    result += ",";
+                    result += reader[1].ToString();
+                    result += ",";
+                    result += reader[2].ToString();
+                    return result;
+                }
+                else
+                {
+                    //不存在
+                    return "";
+                }
+                
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return "";
+            }
+            finally//无论如何都会去执行的语句
+            {
+                conn.Close();//关闭连接
+            }
+        }
+
+        public static string Register(string qudaoid,string name)
+        {
+            MySqlConnection conn = new MySqlConnection(Class1.connectStr);//还未与数据库建立连接
+            try//捕捉异常，并打印
+            {
+                conn.Open();//建立连接
+                Console.WriteLine("已经与数据库建立连接");
+
+                string sql = String.Format("SELECT * FROM game1.users WHERE qudaoid='{0}'", qudaoid);//数据库操作命令,读取数据行数
+
+                MySqlCommand cmd = new MySqlCommand(sql, conn);//数据库命令类
+                MySqlDataReader reader = cmd.ExecuteReader();
                 reader.Read();
-                string result = reader[0].ToString();
-                result += ",";
-                result += reader[1].ToString();
-                result += ",";
-                result += reader[2].ToString();
-                return result;
+                if (reader.HasRows)//存在
+                {
+                    string userid = reader[2].ToString();
+                    Console.WriteLine(userid);
+                    reader.Close();
+                    //找到后再去查找用户信息表
+                    sql = String.Format("SELECT * FROM game1.usersinfo WHERE userid='{0}'", userid);
+                    cmd.CommandText = sql;
+                    reader = cmd.ExecuteReader();
+                    reader.Read();
+                    string result = reader[0].ToString();
+                    result += ",";
+                    result += reader[1].ToString();
+                    result += ",";
+                    result += reader[2].ToString();
+                    return result;
+                }
+                else
+                {
+                    //不存在
+                    //开始创建用户，创建用户信息
+                    reader.Close();
+                    string userid = Guid.NewGuid().ToString();
+                    Console.WriteLine("创建用户" + userid);
+                    sql = String.Format("INSERT INTO game1.users(qudaoid, userid) VALUES('{0}', '{1}')", qudaoid, userid);
+                    cmd.CommandText = sql;
+                    reader = cmd.ExecuteReader();
+                    reader.Read();
+                    reader.Close();
+
+                    //找到后再去查找用户信息表
+                    sql = String.Format("INSERT INTO game1.usersinfo(userid, name) VALUES('{0}', '{1}')", userid, name);
+                    cmd.CommandText = sql;
+                    reader = cmd.ExecuteReader();
+                    reader.Read();
+                    reader.Close();
+                    sql = String.Format("SELECT * FROM game1.usersinfo WHERE userid='{0}'", userid);
+                    cmd.CommandText = sql;
+                    reader = cmd.ExecuteReader();
+                    reader.Read();
+                    string result = reader[0].ToString();
+                    result += ",";
+                    result += reader[1].ToString();
+                    result += ",";
+                    result += reader[2].ToString();
+                    return result;
+                }
+
             }
             catch (Exception e)
             {
