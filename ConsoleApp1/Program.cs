@@ -17,15 +17,13 @@ namespace MyApp // Note: actual namespace depends on the project name.
         { 
             Login = 10001, //登录
             Register, 
-            Tue, 
-            Wed, 
-            Thu, 
-            Fri, 
-            Sat 
+            Kickout, //踢出
+            Listener = 1000000, 
         };
 
         private static Socket server = null;
         private static byte[] result = new byte[1024];
+        private static Dictionary<string, Socket> sockets = new Dictionary<string, Socket>();
         static void Main(string[] args)
         {
             Console.WriteLine("服务器运行中");
@@ -103,6 +101,26 @@ namespace MyApp // Note: actual namespace depends on the project name.
                                     str += Class1.Register(qudaoid, name);
                                     //返回给客户端
                                     myClientSocket.Send(Encoding.UTF8.GetBytes(str));
+                                }
+                                break;
+                            case Command.Listener:
+                                {
+                                    Console.WriteLine("开始保存socket");
+                                    string userid = array[1];
+                                    //返回给客户端
+                                    myClientSocket.Send(Encoding.UTF8.GetBytes(str));
+                                    if (sockets.ContainsKey(userid))
+                                    {
+                                        str = (int)Command.Kickout + ",";
+                                        sockets[userid].Send(Encoding.UTF8.GetBytes(str));
+                                        sockets[userid].Shutdown(SocketShutdown.Both);
+                                        sockets[userid].Close();
+                                        sockets[userid] = myClientSocket;
+                                    }
+                                    else
+                                    {
+                                        sockets.Add(userid, myClientSocket);
+                                    }
                                 }
                                 break;
                         }
