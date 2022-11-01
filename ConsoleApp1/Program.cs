@@ -111,6 +111,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
                                     myClientSocket.Send(Encoding.UTF8.GetBytes(str));
                                     if (sockets.ContainsKey(userid))
                                     {
+                                        //列表中已有该用户就踢掉上个连接
                                         str = (int)Command.Kickout + ",";
                                         sockets[userid].Send(Encoding.UTF8.GetBytes(str));
                                         sockets[userid].Shutdown(SocketShutdown.Both);
@@ -119,6 +120,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
                                     }
                                     else
                                     {
+                                        //列表中没有该用户就加入列表
                                         sockets.Add(userid, myClientSocket);
                                     }
                                 }
